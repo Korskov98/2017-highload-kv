@@ -5,9 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-/**
- * Created by Aleksey on 08.10.2017.
- */
 public interface MyDAO {
     @NotNull
     byte[] get(@NotNull String key) throws NoSuchElementException, IllegalArgumentException, IOException;
