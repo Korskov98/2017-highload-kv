@@ -1,7 +1,6 @@
 package ru.mail.polis.Korskov;
 
 import org.jetbrains.annotations.NotNull;
-
 import java.io.*;
 import java.util.NoSuchElementException;
 
@@ -14,7 +13,7 @@ public class MyFileDAO implements MyDAO {
     }
 
     @NotNull
-    private File getFile(@NotNull final String key){
+    private File getFile(@NotNull final String key) throws IOException {
         return new File(dir, key);
     }
 
@@ -25,8 +24,10 @@ public class MyFileDAO implements MyDAO {
         final byte[] value = new byte[(int) file.length()];
         try (InputStream is = new FileInputStream(file)){
             if (is.read(value) != value.length){
-                throw new IOException("Error read");
-            }
+                try (BufferedInputStream f = new BufferedInputStream(new FileInputStream(file))) {
+                    return new FileReader(f).read();
+                }
+             }
         }
         return value;
     }
