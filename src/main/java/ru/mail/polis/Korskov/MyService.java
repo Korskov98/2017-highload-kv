@@ -1,11 +1,13 @@
-package ru.mail.polis.Korskov;
+package ru.mail.polis.korskov;
 
 import com.sun.net.httpserver.HttpServer;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.polis.KVService;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.NoSuchElementException;
+import java.io.ByteArrayOutputStream;
 
 public class MyService implements KVService {
     private static final String PREFIX = "id=";
@@ -62,14 +64,15 @@ public class MyService implements KVService {
                         http.sendResponseHeaders(202, 0);
                         break;
                     case "PUT":
-                        int contentLength = 0;
-                        if (http.getRequestHeaders().getFirst("Content-Length") != null) {
-                            contentLength = Integer.valueOf(http.getRequestHeaders().getFirst("Content-Length"));
+                        InputStream is = http.getRequestBody();
+                        ByteArrayOutputStream data = new ByteArrayOutputStream();
+                        byte[] buffer = new byte[8192];
+                        int read = 0;
+                        while((read = is.read(buffer)) != -1) {
+                            data.write(buffer, 0, read);
                         }
-                        final byte[] putValue = new byte[contentLength];
-                        http.getRequestBody().read(putValue);
                         try {
-                            dao.upsert(id, putValue);
+                            dao.upsert(id, data.toByteArray());
                         } catch (IllegalArgumentException e) {
                             http.sendResponseHeaders(400, ERROR_PUT.length());
                             http.getResponseBody().write(ERROR_PUT.getBytes());

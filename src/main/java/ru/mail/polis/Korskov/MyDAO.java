@@ -1,4 +1,4 @@
-package ru.mail.polis.Korskov;
+package ru.mail.polis.korskov;
 
 import org.jetbrains.annotations.NotNull;
 import java.io.IOException;

@@ -1,14 +1,16 @@
-package ru.mail.polis.Korskov;
+package ru.mail.polis.korskov;
 
 import org.jetbrains.annotations.NotNull;
 import java.io.*;
 import java.util.NoSuchElementException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class MyFileDAO implements MyDAO {
     @NotNull
-    private final File dir;
+    private final String dir;
 
-    public MyFileDAO(@NotNull final File dir) {
+    public MyFileDAO(@NotNull final String dir) {
         this.dir = dir;
     }
 
@@ -20,16 +22,7 @@ public class MyFileDAO implements MyDAO {
     @NotNull
     @Override
     public byte[] get(@NotNull final String key) throws NoSuchElementException, IllegalArgumentException, IOException {
-        final File file = getFile(key);
-        final byte[] value = new byte[(int) file.length()];
-        try (InputStream is = new FileInputStream(file)){
-            if (is.read(value) != value.length){
-                try (BufferedInputStream f = new BufferedInputStream(new FileInputStream(file))) {
-                    return new FileReader(f).read();
-                }
-             }
-        }
-        return value;
+        return Files.readAllBytes(Paths.get(dir, key));
     }
 
     @Override
