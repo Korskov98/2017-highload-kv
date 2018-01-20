@@ -3,11 +3,13 @@ package ru.mail.polis.korskov;
 import com.sun.net.httpserver.HttpServer;
 import org.jetbrains.annotations.NotNull;
 import ru.mail.polis.KVService;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.NoSuchElementException;
 import java.io.ByteArrayOutputStream;
+import java.util.concurrent.Executors;
 
 public class MyService implements KVService {
     private static final String PREFIX = "id=";
@@ -22,6 +24,7 @@ public class MyService implements KVService {
 
     public MyService(int port, @NotNull final MyDAO dao) throws IOException {
         this.server = HttpServer.create(new InetSocketAddress(port), 0);
+        this.server.setExecutor(Executors.newCachedThreadPool());
         this.dao = dao;
         this.server.createContext("/v0/status", http -> {
             final String response = "ONLINE";
@@ -68,7 +71,7 @@ public class MyService implements KVService {
                         ByteArrayOutputStream data = new ByteArrayOutputStream();
                         byte[] buffer = new byte[8192];
                         int read = 0;
-                        while((read = is.read(buffer)) != -1) {
+                        while ((read = is.read(buffer)) != -1) {
                             data.write(buffer, 0, read);
                         }
                         try {
@@ -93,7 +96,7 @@ public class MyService implements KVService {
 
     @NotNull
     private static String extractId(@NotNull final String query) {
-        if(!query.startsWith(PREFIX)) {
+        if (!query.startsWith(PREFIX)) {
             throw new IllegalArgumentException("Error");
         }
         return query.substring(PREFIX.length());

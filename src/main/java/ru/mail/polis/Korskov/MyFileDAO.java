@@ -1,6 +1,7 @@
 package ru.mail.polis.korskov;
 
 import org.jetbrains.annotations.NotNull;
+
 import java.io.*;
 import java.util.NoSuchElementException;
 import java.nio.file.Files;
@@ -27,14 +28,12 @@ public class MyFileDAO implements MyDAO {
 
     @Override
     public void upsert(@NotNull final String key, @NotNull final byte[] value) throws IllegalArgumentException, IOException {
-        try (OutputStream os = new FileOutputStream(getFile(key))){
-            os.write(value);
-        }
+        Files.write(Paths.get(dir, key), value);
     }
 
     @NotNull
     @Override
     public void delete(@NotNull final String key) throws IllegalArgumentException, IOException {
-        getFile(key).delete();
+        Files.deleteIfExists(Paths.get(dir, key));
     }
 }
